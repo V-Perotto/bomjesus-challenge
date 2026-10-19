@@ -12,7 +12,7 @@ const MESSAGES = {
   size: (min: number, max: number) => `deve ter entre ${min} e ${max} caracteres`,
   maxSize: (max: number) => `deve ter no máximo ${max} caracteres`,
   email: 'deve ser um e-mail válido',
-  phone: 'deve conter de 8 a 15 dígitos (são permitidos +, espaços, parênteses e hífens)',
+  phone: 'deve estar no formato +55 (00) 00000-0000 ou +55 (00) 0000-0000',
   studentNumber: 'deve ter de 1 a 20 caracteres entre letras, dígitos e hífen',
   photo: 'deve ser uma URL http ou https válida',
   zipCode: 'deve ter de 3 a 20 caracteres entre letras, dígitos, espaços e hífen',
@@ -23,7 +23,7 @@ const MESSAGES = {
   salaryDigits: 'deve ter no máximo 2 casas decimais',
 } as const
 
-const PHONE = /^(?=(?:\D*\d){8,15}\D*$)\+?[0-9 ()-]+$/
+const PHONE = /^\+55 \(\d{2}\) \d{4,5}-\d{4}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const STUDENT_NUMBER = /^[A-Za-z0-9-]{1,20}$/
 const PHOTO_URL = /^https?:\/\/\S+$/
@@ -73,11 +73,7 @@ function validateAddress(errors: ValidationErrors, address: Address, index: numb
 export function validatePerson(form: PersonForm): ValidationErrors {
   const errors: ValidationErrors = {}
   check(errors, 'name', form.name, [required, length(3, 100)])
-  check(errors, 'phoneNumber', form.phoneNumber, [
-    required,
-    maxLength(20),
-    matches(PHONE, MESSAGES.phone),
-  ])
+  check(errors, 'phoneNumber', form.phoneNumber, [required, matches(PHONE, MESSAGES.phone)])
   check(errors, 'emailAddress', form.emailAddress, [
     required,
     matches(EMAIL, MESSAGES.email),

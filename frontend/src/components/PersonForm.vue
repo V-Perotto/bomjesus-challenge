@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="F extends PersonForm">
 import type { PersonForm } from '@/types/person'
+import { phoneMask } from '@/utils/masks'
 import AddressFieldset from './AddressFieldset.vue'
 import TextField from './TextField.vue'
 
@@ -44,8 +45,8 @@ const emit = defineEmits<{
         type="tel"
         inputmode="tel"
         placeholder="+55 (41) 99999-0000"
+        :mask="phoneMask"
         :error="errors.phoneNumber"
-        :maxlength="20"
         required
       />
       <div class="field">

@@ -29,6 +29,8 @@ function validProfessor(overrides: Partial<ProfessorForm> = {}): ProfessorForm {
   return { ...emptyProfessorForm(), ...base, salary: '8.500,00', ...overrides }
 }
 
+const PHONE_MESSAGE = 'deve estar no formato +55 (00) 00000-0000 ou +55 (00) 0000-0000'
+
 describe('validateStudentForm', () => {
   it('aceita um aluno válido sem foto', () => {
     expect(validateStudentForm(validStudent())).toEqual({})
@@ -45,9 +47,22 @@ describe('validateStudentForm', () => {
       validStudent({ name: 'Al', phoneNumber: '123', emailAddress: 'ana@escola' }),
     )
     expect(errors.name).toBe('deve ter entre 3 e 100 caracteres')
-    expect(errors.phoneNumber).toContain('8 a 15 dígitos')
+    expect(errors.phoneNumber).toBe(PHONE_MESSAGE)
     expect(errors.emailAddress).toBe('deve ser um e-mail válido')
   })
+
+  it.each(['+55 (41) 99999-0001', '+55 (41) 3333-0001'])('aceita o telefone "%s"', (phone) => {
+    expect(validateStudentForm(validStudent({ phoneNumber: phone })).phoneNumber).toBeUndefined()
+  })
+
+  it.each(['+55 (41) 9999', '41999990001', '+1 (555) 123-4567'])(
+    'rejeita o telefone fora do formato "%s"',
+    (phone) => {
+      expect(validateStudentForm(validStudent({ phoneNumber: phone })).phoneNumber).toBe(
+        PHONE_MESSAGE,
+      )
+    },
+  )
 
   it('valida matrícula e foto', () => {
     const errors = validateStudentForm(validStudent({ studentNumber: 'MAT 01', photo: 'ftp://x' }))

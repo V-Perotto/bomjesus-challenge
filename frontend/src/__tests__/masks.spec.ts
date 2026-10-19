@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyMask, maskInput, type MaskedValue } from '@/utils/masks'
+import { applyMask, maskInput, phoneMask, type MaskedValue } from '@/utils/masks'
 import { centsMask, pairMask, prefixedMask } from './testMasks'
 
 /** Mostra o cursor como "|" para comparar valor e posição de uma vez. */
@@ -99,6 +99,97 @@ describe('maskInput (genérico)', () => {
       previous: '+9 1',
       value: '+9 ',
       caret: 3,
+      inputType: 'deleteContentBackward',
+    })
+    expect(result).toEqual({ value: '', caret: 0 })
+  })
+})
+
+describe('phoneMask', () => {
+  it.each([
+    ['', ''],
+    ['4', '+55 (4'],
+    ['41', '+55 (41'],
+    ['419', '+55 (41) 9'],
+    ['4133330001', '+55 (41) 3333-0001'],
+    ['41999990001', '+55 (41) 99999-0001'],
+    ['419999900019', '+55 (41) 99999-0001'],
+    ['41a9b9#9', '+55 (41) 999'],
+    ['(41) 99999-0001', '+55 (41) 99999-0001'],
+    ['+55 41 99999 0001', '+55 (41) 99999-0001'],
+    ['5541999990001', '+55 (41) 99999-0001'],
+    ['554133330001', '+55 (41) 3333-0001'],
+    ['55999990001', '+55 (55) 99999-0001'],
+    ['+55 (', ''],
+  ])('formata "%s" como "%s"', (text, expected) => {
+    expect(applyMask(phoneMask, text)).toBe(expected)
+  })
+
+  it('insere +55 ao receber o primeiro dígito', () => {
+    const result = maskInput(phoneMask, {
+      previous: '',
+      value: '4',
+      caret: 1,
+      inputType: 'insertText',
+    })
+    expect(withCaret(result)).toBe('+55 (4|')
+  })
+
+  it('ignora letra digitada', () => {
+    const result = maskInput(phoneMask, {
+      previous: '+55 (41) 9',
+      value: '+55 (41) 9x',
+      caret: 11,
+      inputType: 'insertText',
+    })
+    expect(withCaret(result)).toBe('+55 (41) 9|')
+  })
+
+  it('inserção no meio de número completo desloca os dígitos e descarta o último', () => {
+    const result = maskInput(phoneMask, {
+      previous: '+55 (41) 99999-0001',
+      value: '+55 (41) 998999-0001',
+      caret: 12,
+      inputType: 'insertText',
+    })
+    expect(withCaret(result)).toBe('+55 (41) 998|99-9000')
+  })
+
+  it('Backspace logo após o hífen apaga o dígito anterior', () => {
+    const result = maskInput(phoneMask, {
+      previous: '+55 (41) 99999-0001',
+      value: '+55 (41) 999990001',
+      caret: 14,
+      inputType: 'deleteContentBackward',
+    })
+    expect(withCaret(result)).toBe('+55 (41) 9999|-0001')
+  })
+
+  it('Backspace dentro do prefixo +55 não altera o valor', () => {
+    const result = maskInput(phoneMask, {
+      previous: '+55 (41) 9',
+      value: '+5 (41) 9',
+      caret: 2,
+      inputType: 'deleteContentBackward',
+    })
+    expect(withCaret(result)).toBe('+55 |(41) 9')
+  })
+
+  it('substituir todo o conteúdo trata o texto como entrada nova', () => {
+    const result = maskInput(phoneMask, {
+      previous: '+55 (41) 9',
+      value: '4',
+      caret: 1,
+      inputType: 'insertText',
+    })
+    expect(withCaret(result)).toBe('+55 (4|')
+  })
+
+  it('apagar o único dígito esvazia o campo, sem +55 residual', () => {
+    const result = maskInput(phoneMask, {
+      previous: '+55 (4',
+      value: '+55 (',
+      caret: 5,
       inputType: 'deleteContentBackward',
     })
     expect(result).toEqual({ value: '', caret: 0 })

@@ -172,3 +172,52 @@ function positionBeforeLastDigits(text: string, count: number): number {
   }
   return 0
 }
+
+/** "12345678" → "12345-678": hífen antes do dígito de índice `after`, se houver dígito depois. */
+function insertHyphen(digits: string, after: number): string {
+  return digits.length > after ? `${digits.slice(0, after)}-${digits.slice(after)}` : digits
+}
+
+const PHONE_COUNTRY_CODE = '55'
+const PHONE_PREFIX = `+${PHONE_COUNTRY_CODE} `
+const PHONE_MAX_DIGITS = 11
+const PHONE_WITH_COUNTRY_CODE_LENGTHS = [12, 13]
+const AREA_CODE_DIGITS = 2
+const MOBILE_HYPHEN_AFTER = 5
+const LANDLINE_HYPHEN_AFTER = 4
+
+/**
+ * Dígitos nacionais (DDD + número). O "55" inicial é código do país quando vem do próprio
+ * prefixo ("+55 ...") ou de uma colagem com 12–13 dígitos; digitado tecla a tecla, é DDD.
+ */
+function phoneDigits(text: string): string {
+  const digits = onlyDigits(text)
+  const hasPrefix = text.trimStart().startsWith(PHONE_PREFIX.trimEnd())
+  const pastedWithCountryCode =
+    PHONE_WITH_COUNTRY_CODE_LENGTHS.includes(digits.length) && digits.startsWith(PHONE_COUNTRY_CODE)
+  const national =
+    hasPrefix || pastedWithCountryCode ? digits.slice(PHONE_COUNTRY_CODE.length) : digits
+  return national.slice(0, PHONE_MAX_DIGITS)
+}
+
+/** "41999990001" → "+55 (41) 99999-0001"; "4133330001" → "+55 (41) 3333-0001" */
+function formatPhone(digits: string): string {
+  if (!digits) {
+    return ''
+  }
+  const areaCode = digits.slice(0, AREA_CODE_DIGITS)
+  if (digits.length <= AREA_CODE_DIGITS) {
+    return `${PHONE_PREFIX}(${areaCode}`
+  }
+  const hyphenAfter =
+    digits.length === PHONE_MAX_DIGITS ? MOBILE_HYPHEN_AFTER : LANDLINE_HYPHEN_AFTER
+  const number = insertHyphen(digits.slice(AREA_CODE_DIGITS), hyphenAfter)
+  return `${PHONE_PREFIX}(${areaCode}) ${number}`
+}
+
+export const phoneMask: InputMask = {
+  anchor: 'start',
+  prefix: PHONE_PREFIX,
+  digits: phoneDigits,
+  format: formatPhone,
+}
