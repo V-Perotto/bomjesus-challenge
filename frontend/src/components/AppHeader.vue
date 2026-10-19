@@ -36,7 +36,7 @@ const isSection = (prefix: string) => route.path === prefix || route.path.starts
 <style scoped>
 .app-header {
   background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 4px solid var(--color-brand-lime);
 }
 
 .app-header__inner {
@@ -76,5 +76,6 @@ const isSection = (prefix: string) => route.path === prefix || route.path.starts
 .app-header__tab.is-active {
   background: var(--color-primary-soft);
   color: var(--color-primary);
+  box-shadow: inset 0 -3px 0 var(--color-brand-lime);
 }
 </style>

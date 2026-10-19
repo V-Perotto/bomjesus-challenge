@@ -1,19 +1,25 @@
-/* Tokens de design */
+/*
+ * Tokens de design — paleta do Grupo Educacional Bom Jesus:
+ * verde-escuro #005724 (cor principal) e verde-lima #A5CD39 (detalhes de identidade).
+ * O lima não é usado como fundo de texto branco (contraste 1,8:1); os pares abaixo passam no WCAG AA.
+ */
 :root {
-  --color-bg: #f5f7fb;
+  --color-brand-dark: #005724;
+  --color-brand-lime: #a5cd39;
+  --color-bg: #f4f7f1;
   --color-surface: #ffffff;
-  --color-border: #dfe4ec;
+  --color-border: #dde5d6;
   --color-text: #1f2937;
   --color-text-muted: #5b6577;
-  --color-primary: #1d4ed8;
-  --color-primary-hover: #1e40af;
-  --color-primary-soft: #e8eefc;
-  --color-success: #15803d;
-  --color-success-soft: #e7f6ec;
+  --color-primary: var(--color-brand-dark);
+  --color-primary-hover: #003d19;
+  --color-primary-soft: #eef6dc;
+  --color-success: var(--color-brand-dark);
+  --color-success-soft: #eef6dc;
   --color-danger: #b91c1c;
   --color-danger-soft: #fdecec;
-  --color-neutral-soft: #eef1f5;
-  --color-focus: #f59e0b;
+  --color-neutral-soft: #eef1ec;
+  --color-focus: #5f8a17;
   --radius: 10px;
   --radius-sm: 6px;
   --space-1: 0.25rem;
