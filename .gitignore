@@ -1,0 +1,22 @@
+# Back-end (Maven)
+backend/target/
+*.class
+*.log
+
+# Front-end (Node/Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/.env
+frontend/.env.local
+
+# IDEs e sistema operacional
+.idea/
+.vscode/
+*.iml
+*.swp
+.DS_Store
+Thumbs.db
+
+# IA
+.claude
