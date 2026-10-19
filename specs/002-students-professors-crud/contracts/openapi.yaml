@@ -1,0 +1,402 @@
+openapi: 3.1.0
+info:
+  title: Bom Jesus Academic API
+  version: 1.0.0
+  description: >
+    API REST de gestão de alunos (Student) e professores (Professor), subtipos de Person,
+    com endereços (Address, 1..*) e status (ACTIVE | DISABLE).
+    Contrato da feature 002-students-professors-crud. Mensagens de erro em pt-BR.
+    Listagens em ordem alfabética do português (ignora maiúsculas e acentos; empate por id).
+    Rotas inexistentes sob /api → 404 (ProblemDetail). Accept sem JSON → 406 (sem corpo).
+    Campos opcionais sem valor são retornados como null, nunca omitidos.
+servers:
+  - url: http://localhost:8080
+    description: Execução local ou container do back-end
+  - url: http://localhost:8081
+    description: Via Nginx do front-end (docker compose), que repassa /api ao back-end
+tags:
+  - name: Students
+  - name: Professors
+
+paths:
+  /api/students:
+    get:
+      tags: [Students]
+      operationId: listStudents
+      summary: Lista alunos em ordem alfabética de nome
+      parameters:
+        - $ref: '#/components/parameters/StatusFilter'
+      responses:
+        '200':
+          description: Lista (possivelmente vazia)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/StudentResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+    post:
+      tags: [Students]
+      operationId: createStudent
+      summary: Cria um aluno
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StudentRequest' }
+            example:
+              name: Ana Souza
+              phoneNumber: '+55 (41) 99999-0001'
+              emailAddress: ana@escola.com
+              studentNumber: '2026001'
+              photo: https://i.pravatar.cc/150?img=5
+              addresses:
+                - street: Rua XV de Novembro, 100
+                  city: Curitiba
+                  state: PR
+                  zipCode: 80020-310
+                  country: Brasil
+      responses:
+        '201':
+          description: Aluno criado
+          headers:
+            Location:
+              description: URI do novo recurso (/api/students/{id})
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StudentResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/students/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Students]
+      operationId: getStudent
+      summary: Busca um aluno pelo id
+      responses:
+        '200':
+          description: Aluno encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StudentResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Students]
+      operationId: updateStudent
+      summary: Atualiza um aluno por completo (a lista de endereços é substituída)
+      description: >
+        Todos os campos obrigatórios devem ser enviados. Se `status` for omitido, o status atual é
+        mantido. A lista `addresses` enviada substitui integralmente a anterior.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StudentRequest' }
+      responses:
+        '200':
+          description: Aluno atualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StudentResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [Students]
+      operationId: deleteStudent
+      summary: Remove definitivamente um aluno e seus endereços
+      responses:
+        '204': { description: Removido (sem corpo) }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/professors:
+    get:
+      tags: [Professors]
+      operationId: listProfessors
+      summary: Lista professores em ordem alfabética de nome
+      parameters:
+        - $ref: '#/components/parameters/StatusFilter'
+      responses:
+        '200':
+          description: Lista (possivelmente vazia)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProfessorResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+    post:
+      tags: [Professors]
+      operationId: createProfessor
+      summary: Cria um professor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProfessorRequest' }
+            example:
+              name: Carlos Lima
+              phoneNumber: '+55 41 3333-0002'
+              emailAddress: carlos@escola.com
+              salary: 8500.00
+              addresses:
+                - street: Av. Sete de Setembro, 2000
+                  city: Curitiba
+                  state: PR
+                  zipCode: 80230-010
+                  country: Brasil
+      responses:
+        '201':
+          description: Professor criado
+          headers:
+            Location:
+              description: URI do novo recurso (/api/professors/{id})
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfessorResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /api/professors/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Professors]
+      operationId: getProfessor
+      summary: Busca um professor pelo id
+      responses:
+        '200':
+          description: Professor encontrado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfessorResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Professors]
+      operationId: updateProfessor
+      summary: Atualiza um professor por completo (a lista de endereços é substituída)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProfessorRequest' }
+      responses:
+        '200':
+          description: Professor atualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfessorResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [Professors]
+      operationId: deleteProfessor
+      summary: Remove definitivamente um professor e seus endereços
+      responses:
+        '204': { description: Removido (sem corpo) }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Identificador numérico; valor não numérico resulta em 400
+      schema: { type: integer, format: int64 }
+    StatusFilter:
+      name: status
+      in: query
+      required: false
+      description: >
+        Filtra por um único status (diferencia maiúsculas/minúsculas); valor fora do enum
+        resulta em 400; se o parâmetro for repetido, vale o primeiro valor
+      schema: { $ref: '#/components/schemas/Status' }
+
+  schemas:
+    Status:
+      type: string
+      enum: [ACTIVE, DISABLE]
+
+    AddressRequest:
+      type: object
+      required: [street, city, state, zipCode, country]
+      properties:
+        street: { type: string, maxLength: 150 }
+        city: { type: string, maxLength: 100 }
+        state: { type: string, minLength: 2, maxLength: 100 }
+        zipCode: { type: string, pattern: '^[A-Za-z0-9 -]{3,20}$' }
+        country: { type: string, minLength: 2, maxLength: 100 }
+
+    AddressResponse:
+      type: object
+      required: [street, city, state, zipCode, country]
+      properties:
+        street: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zipCode: { type: string }
+        country: { type: string }
+
+    PersonRequestBase:
+      type: object
+      required: [name, phoneNumber, emailAddress, addresses]
+      properties:
+        name: { type: string, minLength: 3, maxLength: 100 }
+        phoneNumber:
+          type: string
+          maxLength: 20
+          description: Dígitos com '+' inicial, espaços, parênteses e hífens opcionais; 8 a 15 dígitos
+        emailAddress:
+          type: string
+          format: email
+          maxLength: 150
+          description: Único entre todas as pessoas (sem diferenciar maiúsculas); gravado em minúsculas
+        status:
+          $ref: '#/components/schemas/Status'
+          description: Opcional. Criação sem status → ACTIVE; atualização sem status → mantém o atual
+        addresses:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/AddressRequest' }
+
+    StudentRequest:
+      allOf:
+        - $ref: '#/components/schemas/PersonRequestBase'
+        - type: object
+          required: [studentNumber]
+          properties:
+            studentNumber:
+              type: string
+              pattern: '^[A-Za-z0-9-]{1,20}$'
+              description: Único entre alunos (sem diferenciar maiúsculas); gravado em maiúsculas
+            photo:
+              type: [string, 'null']
+              format: uri
+              maxLength: 500
+              pattern: '^https?://\S+$'
+              description: Opcional; link http/https de uma imagem pública
+
+    ProfessorRequest:
+      allOf:
+        - $ref: '#/components/schemas/PersonRequestBase'
+        - type: object
+          required: [salary]
+          properties:
+            salary:
+              type: number
+              exclusiveMinimum: 0
+              maximum: 1000000.00
+              multipleOf: 0.01
+              description: Valor em reais com no máximo 2 casas decimais
+
+    PersonResponseBase:
+      type: object
+      required: [id, name, phoneNumber, emailAddress, status, addresses]
+      properties:
+        id: { type: integer, format: int64 }
+        name: { type: string }
+        phoneNumber: { type: string }
+        emailAddress: { type: string }
+        status: { $ref: '#/components/schemas/Status' }
+        addresses:
+          type: array
+          items: { $ref: '#/components/schemas/AddressResponse' }
+
+    StudentResponse:
+      allOf:
+        - $ref: '#/components/schemas/PersonResponseBase'
+        - type: object
+          required: [studentNumber, photo]
+          properties:
+            studentNumber: { type: string }
+            photo:
+              type: [string, 'null']
+              description: null quando o aluno não tem foto (o campo nunca é omitido)
+
+    ProfessorResponse:
+      allOf:
+        - $ref: '#/components/schemas/PersonResponseBase'
+        - type: object
+          required: [salary]
+          properties:
+            salary: { type: number, description: Sempre com 2 casas decimais }
+
+    FieldError:
+      type: object
+      required: [field, message]
+      properties:
+        field:
+          type: string
+          description: Caminho do campo, ex. emailAddress ou addresses[0].city
+        message: { type: string }
+
+    ProblemDetail:
+      type: object
+      description: RFC 9457 (application/problem+json), com extensões timestamp e errors
+      required: [title, status, detail, instance, timestamp]
+      properties:
+        type: { type: string, default: about:blank }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        timestamp: { type: string, format: date-time }
+        errors:
+          type: array
+          items: { $ref: '#/components/schemas/FieldError' }
+
+  responses:
+    BadRequest:
+      description: >
+        Requisição inválida: validação de campos, JSON malformado, tipo incorreto,
+        id não numérico ou filtro de status inválido
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetail' }
+          example:
+            type: about:blank
+            title: Dados inválidos
+            status: 400
+            detail: A requisição possui 1 campo(s) inválido(s).
+            instance: /api/students
+            timestamp: '2026-10-19T14:30:00Z'
+            errors:
+              - field: addresses
+                message: informe ao menos um endereço
+    NotFound:
+      description: Recurso inexistente
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetail' }
+          example:
+            type: about:blank
+            title: Recurso não encontrado
+            status: 404
+            detail: Aluno com id 99 não encontrado.
+            instance: /api/students/99
+            timestamp: '2026-10-19T14:30:00Z'
+    Conflict:
+      description: E-mail (qualquer pessoa) ou matrícula (aluno) já cadastrados
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetail' }
+          example:
+            type: about:blank
+            title: Conflito
+            status: 409
+            detail: Já existe uma pessoa cadastrada com o e-mail ana@escola.com.
+            instance: /api/professors
+            timestamp: '2026-10-19T14:30:00Z'
+            errors:
+              - field: emailAddress
+                message: e-mail já cadastrado
