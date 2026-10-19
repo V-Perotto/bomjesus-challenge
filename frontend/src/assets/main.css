@@ -1,0 +1,371 @@
+/* Tokens de design */
+:root {
+  --color-bg: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-border: #dfe4ec;
+  --color-text: #1f2937;
+  --color-text-muted: #5b6577;
+  --color-primary: #1d4ed8;
+  --color-primary-hover: #1e40af;
+  --color-primary-soft: #e8eefc;
+  --color-success: #15803d;
+  --color-success-soft: #e7f6ec;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fdecec;
+  --color-neutral-soft: #eef1f5;
+  --color-focus: #f59e0b;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --shadow: 0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0;
+}
+
+h1[tabindex='-1']:focus {
+  outline: none;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: var(--space-2);
+  background: var(--color-surface);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  z-index: 10;
+}
+
+.skip-link:focus {
+  left: var(--space-2);
+}
+
+/* Página */
+.page {
+  padding: var(--space-6) 0 var(--space-8);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.page__header h1 {
+  font-size: 1.6rem;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-6);
+}
+
+/* Botões */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-neutral-soft);
+}
+
+.btn--danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+/* Ação de exclusão: visualmente secundária em relação a "Desativar" (FR-023a) */
+.btn--danger-ghost {
+  background: transparent;
+  color: var(--color-danger);
+  border-color: transparent;
+}
+
+.btn--danger-ghost:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+
+.btn--small {
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.875rem;
+}
+
+/* Formulários */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.field__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.field__required {
+  color: var(--color-danger);
+  margin-left: 2px;
+}
+
+.field__control {
+  display: flex;
+  align-items: stretch;
+}
+
+.field__prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-right: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  background: var(--color-neutral-soft);
+  color: var(--color-text-muted);
+}
+
+.field__prefix + .field__input {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.field__input {
+  width: 100%;
+  height: 2.625rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  color: inherit;
+  background: var(--color-surface);
+}
+
+.field__input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.field__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+/* Tabela que vira lista de cartões em telas estreitas */
+.table-wrapper {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table__cell--nowrap,
+.table__actions-cell {
+  white-space: nowrap;
+}
+
+.table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: var(--color-neutral-soft);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table__actions-cell {
+  width: 1%;
+}
+
+.table__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .table--cards thead {
+    display: none;
+  }
+
+  .table--cards tr {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .table--cards td {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-1) 0;
+    border: none;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .table--cards td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-align: left;
+  }
+
+  .table--cards .table__actions-cell {
+    display: block;
+    width: auto;
+    padding-top: var(--space-2);
+  }
+
+  .table--cards .table__actions-cell::before {
+    content: none;
+  }
+
+  .table--cards .table__actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+/* Selo de status */
+.badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge--active {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.badge--disable {
+  background: var(--color-neutral-soft);
+  color: var(--color-text-muted);
+}
+
+/* Estados de lista */
+.state {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-muted);
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+}
+
+.state--error {
+  color: var(--color-danger);
+}
