@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: ./backend
+    image: bomjesus-academic-api
+    ports:
+      - "8080:8080"
+    environment:
+      # "demo" carrega os dados de demonstração; sem a variável o banco inicia vazio
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      DB_USERNAME: ${DB_USERNAME:-sa}
+      DB_PASSWORD: ${DB_PASSWORD:-}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/students"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
+  frontend:
+    build: ./frontend
+    image: bomjesus-academic-ui
+    ports:
+      - "8081:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
