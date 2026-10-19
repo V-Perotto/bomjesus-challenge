@@ -2,6 +2,8 @@
  * Máscaras de entrada só de dígitos e o tratamento do evento de digitação
  * (specs/003-form-input-masks/contracts/input-masks.md).
  */
+import { formatDecimalBR } from './formatters'
+
 export interface InputMask {
   /** Dígitos significativos de qualquer texto (digitado, colado ou formatado), já no limite. */
   digits(text: string): string
@@ -220,4 +222,17 @@ export const phoneMask: InputMask = {
   prefix: PHONE_PREFIX,
   digits: phoneDigits,
   format: formatPhone,
+}
+
+const CURRENCY_MAX_DIGITS = 9
+const CENTS_PER_UNIT = 100
+
+/**
+ * "850000" → "8.500,00": os dígitos são centavos, preenchidos da direita para a esquerda.
+ * Zeros à esquerda saem todos, para Backspace repetido sempre esvaziar o campo.
+ */
+export const currencyMask: InputMask = {
+  anchor: 'end',
+  digits: (text) => onlyDigits(text).replace(/^0+/, '').slice(0, CURRENCY_MAX_DIGITS),
+  format: (digits) => (digits ? formatDecimalBR(Number(digits) / CENTS_PER_UNIT) : ''),
 }

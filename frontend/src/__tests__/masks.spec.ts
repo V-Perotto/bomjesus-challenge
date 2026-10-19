@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { applyMask, maskInput, phoneMask, type MaskedValue } from '@/utils/masks'
+import { parseCurrencyBRL } from '@/utils/formatters'
+import { applyMask, currencyMask, maskInput, phoneMask, type MaskedValue } from '@/utils/masks'
 import { centsMask, pairMask, prefixedMask } from './testMasks'
 
 /** Mostra o cursor como "|" para comparar valor e posição de uma vez. */
@@ -193,5 +194,70 @@ describe('phoneMask', () => {
       inputType: 'deleteContentBackward',
     })
     expect(result).toEqual({ value: '', caret: 0 })
+  })
+})
+
+describe('currencyMask', () => {
+  it.each([
+    ['', ''],
+    ['5', '0,05'],
+    ['50', '0,50'],
+    ['500', '5,00'],
+    ['000500', '5,00'],
+    ['850000', '8.500,00'],
+    ['12345678', '123.456,78'],
+    ['100000000', '1.000.000,00'],
+    ['9999999999', '9.999.999,99'],
+    ['R$ 8.500,00', '8.500,00'],
+    ['8.500,0', '850,00'],
+    ['0', ''],
+    ['abc', ''],
+  ])('formata "%s" como "%s"', (text, expected) => {
+    expect(applyMask(currencyMask, text)).toBe(expected)
+  })
+
+  it('Backspace no fim remove o último dígito e mantém o cursor no fim', () => {
+    const result = maskInput(currencyMask, {
+      previous: '8.500,00',
+      value: '8.500,0',
+      caret: 7,
+      inputType: 'deleteContentBackward',
+    })
+    expect(withCaret(result)).toBe('850,00|')
+  })
+
+  it('ignora letra digitada', () => {
+    const result = maskInput(currencyMask, {
+      previous: '8.500,00',
+      value: '8.500,00a',
+      caret: 9,
+      inputType: 'insertText',
+    })
+    expect(withCaret(result)).toBe('8.500,00|')
+  })
+
+  it('Backspace repetido esvazia o campo sem travar em 0,00 (FR-011)', () => {
+    const states: string[] = []
+    let value = '0,05'
+    while (value) {
+      const raw = value.slice(0, -1)
+      value = maskInput(currencyMask, {
+        previous: value,
+        value: raw,
+        caret: raw.length,
+        inputType: 'deleteContentBackward',
+      }).value
+      states.push(value)
+    }
+    expect(states).toEqual([''])
+  })
+
+  it.each([
+    ['850000', 8500],
+    ['12345678', 123456.78],
+    ['100000000', 1000000],
+    ['5', 0.05],
+  ])('"%s" exibido volta ao mesmo valor numérico %s (FR-013)', (digits, expected) => {
+    expect(parseCurrencyBRL(applyMask(currencyMask, digits))).toBe(expected)
   })
 })

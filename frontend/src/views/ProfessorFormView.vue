@@ -7,6 +7,7 @@ import PersonForm from '@/components/PersonForm.vue'
 import TextField from '@/components/TextField.vue'
 import { usePersonForm } from '@/composables/usePersonForm'
 import { professorService } from '@/services/professorService'
+import { currencyMask } from '@/utils/masks'
 import { emptyProfessorForm, professorFormToRequest, professorToForm } from '@/utils/personForms'
 import { validateProfessorForm } from '@/utils/validators'
 
@@ -69,8 +70,9 @@ onMounted(loadForEdit)
           v-model="form.salary"
           label="Salário"
           prefix="R$"
-          inputmode="decimal"
-          placeholder="8.500,00"
+          inputmode="numeric"
+          placeholder="0,00"
+          :mask="currencyMask"
           :error="errors.salary"
           required
         />
