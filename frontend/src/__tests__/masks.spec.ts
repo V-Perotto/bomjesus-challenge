@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { parseCurrencyBRL } from '@/utils/formatters'
-import { applyMask, currencyMask, maskInput, phoneMask, type MaskedValue } from '@/utils/masks'
+import {
+  applyMask,
+  currencyMask,
+  maskInput,
+  phoneMask,
+  zipCodeMask,
+  type MaskedValue,
+} from '@/utils/masks'
 import { centsMask, pairMask, prefixedMask } from './testMasks'
 
 /** Mostra o cursor como "|" para comparar valor e posição de uma vez. */
@@ -259,5 +266,40 @@ describe('currencyMask', () => {
     ['5', 0.05],
   ])('"%s" exibido volta ao mesmo valor numérico %s (FR-013)', (digits, expected) => {
     expect(parseCurrencyBRL(applyMask(currencyMask, digits))).toBe(expected)
+  })
+})
+
+describe('zipCodeMask', () => {
+  it.each([
+    ['', ''],
+    ['80230', '80230'],
+    ['802300', '80230-0'],
+    ['80230010', '80230-010'],
+    ['802300109', '80230-010'],
+    ['80.230-010', '80230-010'],
+    ['80230 010', '80230-010'],
+    ['8a0b2', '802'],
+  ])('formata "%s" como "%s"', (text, expected) => {
+    expect(applyMask(zipCodeMask, text)).toBe(expected)
+  })
+
+  it('Backspace logo após o hífen apaga o dígito anterior', () => {
+    const result = maskInput(zipCodeMask, {
+      previous: '80230-010',
+      value: '80230010',
+      caret: 5,
+      inputType: 'deleteContentBackward',
+    })
+    expect(withCaret(result)).toBe('8023|0-10')
+  })
+
+  it('não aceita dígitos além do oitavo digitados no fim', () => {
+    const result = maskInput(zipCodeMask, {
+      previous: '80230-010',
+      value: '80230-0109',
+      caret: 10,
+      inputType: 'insertText',
+    })
+    expect(withCaret(result)).toBe('80230-010|')
   })
 })

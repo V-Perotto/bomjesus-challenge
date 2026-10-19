@@ -236,3 +236,13 @@ export const currencyMask: InputMask = {
   digits: (text) => onlyDigits(text).replace(/^0+/, '').slice(0, CURRENCY_MAX_DIGITS),
   format: (digits) => (digits ? formatDecimalBR(Number(digits) / CENTS_PER_UNIT) : ''),
 }
+
+const ZIP_CODE_MAX_DIGITS = 8
+const ZIP_CODE_FIRST_PART_DIGITS = 5
+
+/** "80230010" → "80230-010" */
+export const zipCodeMask: InputMask = {
+  anchor: 'start',
+  digits: (text) => onlyDigits(text).slice(0, ZIP_CODE_MAX_DIGITS),
+  format: (digits) => insertHyphen(digits, ZIP_CODE_FIRST_PART_DIGITS),
+}

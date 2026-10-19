@@ -30,6 +30,7 @@ function validProfessor(overrides: Partial<ProfessorForm> = {}): ProfessorForm {
 }
 
 const PHONE_MESSAGE = 'deve estar no formato +55 (00) 00000-0000 ou +55 (00) 0000-0000'
+const ZIP_CODE_MESSAGE = 'deve estar no formato 00000-000'
 
 describe('validateStudentForm', () => {
   it('aceita um aluno válido sem foto', () => {
@@ -81,7 +82,18 @@ describe('validateStudentForm', () => {
     )
     expect(errors['addresses[0].city']).toBe('é obrigatório')
     expect(errors['addresses[0].state']).toBe('deve ter entre 2 e 100 caracteres')
-    expect(errors['addresses[0].zipCode']).toContain('3 a 20 caracteres')
+    expect(errors['addresses[0].zipCode']).toBe(ZIP_CODE_MESSAGE)
+  })
+
+  it('aceita o CEP no formato 00000-000', () => {
+    const errors = validateStudentForm(validStudent())
+    expect(errors['addresses[0].zipCode']).toBeUndefined()
+  })
+
+  it.each(['8023', '80230010', '02101 A'])('rejeita o CEP fora do formato "%s"', (zipCode) => {
+    const [address] = validStudent().addresses
+    const errors = validateStudentForm(validStudent({ addresses: [{ ...address!, zipCode }] }))
+    expect(errors['addresses[0].zipCode']).toBe(ZIP_CODE_MESSAGE)
   })
 })
 

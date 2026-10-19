@@ -1,16 +1,33 @@
 <script setup lang="ts">
 import type { Address } from '@/types/person'
+import { zipCodeMask, type InputMask } from '@/utils/masks'
 import TextField from './TextField.vue'
 
 const addresses = defineModel<Address[]>({ required: true })
 defineProps<{ errors: Record<string, string> }>()
 const emit = defineEmits<{ add: []; remove: [index: number] }>()
 
-const fields: { key: keyof Address; label: string; maxlength: number }[] = [
+interface AddressField {
+  key: keyof Address
+  label: string
+  maxlength: number
+  mask?: InputMask
+  inputmode?: 'numeric'
+  placeholder?: string
+}
+
+const fields: AddressField[] = [
   { key: 'street', label: 'Rua e número', maxlength: 150 },
   { key: 'city', label: 'Cidade', maxlength: 100 },
   { key: 'state', label: 'Estado', maxlength: 100 },
-  { key: 'zipCode', label: 'CEP', maxlength: 20 },
+  {
+    key: 'zipCode',
+    label: 'CEP',
+    maxlength: 20,
+    mask: zipCodeMask,
+    inputmode: 'numeric',
+    placeholder: '00000-000',
+  },
   { key: 'country', label: 'País', maxlength: 100 },
 ]
 </script>
@@ -44,6 +61,9 @@ const fields: { key: keyof Address; label: string; maxlength: number }[] = [
           v-model="address[field.key]"
           :label="field.label"
           :maxlength="field.maxlength"
+          :mask="field.mask"
+          :inputmode="field.inputmode"
+          :placeholder="field.placeholder"
           :error="errors[`addresses[${index}].${field.key}`]"
           required
         />

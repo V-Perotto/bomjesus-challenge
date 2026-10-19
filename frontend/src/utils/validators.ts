@@ -15,7 +15,7 @@ const MESSAGES = {
   phone: 'deve estar no formato +55 (00) 00000-0000 ou +55 (00) 0000-0000',
   studentNumber: 'deve ter de 1 a 20 caracteres entre letras, dígitos e hífen',
   photo: 'deve ser uma URL http ou https válida',
-  zipCode: 'deve ter de 3 a 20 caracteres entre letras, dígitos, espaços e hífen',
+  zipCode: 'deve estar no formato 00000-000',
   addresses: 'informe ao menos um endereço',
   invalidValue: 'valor inválido',
   salaryMin: 'deve ser maior que zero',
@@ -27,7 +27,7 @@ const PHONE = /^\+55 \(\d{2}\) \d{4,5}-\d{4}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const STUDENT_NUMBER = /^[A-Za-z0-9-]{1,20}$/
 const PHOTO_URL = /^https?:\/\/\S+$/
-const ZIP_CODE = /^[A-Za-z0-9 -]{3,20}$/
+const ZIP_CODE = /^\d{5}-\d{3}$/
 const MAX_SALARY = 1_000_000
 
 type Rule = (value: string) => string | null
