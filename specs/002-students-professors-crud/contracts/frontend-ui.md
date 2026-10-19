@@ -41,10 +41,10 @@ destacada) em todas as rotas.
 
 | Elemento | Comportamento |
 |----------|---------------|
-| Campos comuns (`PersonForm`) | Nome, Telefone, E-mail, Status (`ACTIVE`/`DISABLE`; padrão `ACTIVE` no cadastro) |
+| Campos comuns (`PersonForm`) | Nome, Telefone, E-mail, Status (`ACTIVE`/`DISABLE`; padrão `ACTIVE` no cadastro) (máscaras: ver `specs/003-form-input-masks/contracts/input-masks.md`) |
 | Campos de aluno (slot) | Matrícula; Foto (URL) com pré-visualização (`PhotoAvatar`) |
-| Campos de professor (slot) | Salário (número, 2 casas decimais, prefixo R$) |
-| Endereços (`AddressFieldset`) | um bloco por endereço (Rua, Cidade, Estado, CEP, País); "Adicionar endereço"; "Remover" desabilitado quando só há 1 |
+| Campos de professor (slot) | Salário (número, 2 casas decimais, prefixo R$) (máscaras: ver `specs/003-form-input-masks/contracts/input-masks.md`) |
+| Endereços (`AddressFieldset`) | um bloco por endereço (Rua, Cidade, Estado, CEP, País); "Adicionar endereço"; "Remover" desabilitado quando só há 1 (máscaras: ver `specs/003-form-input-masks/contracts/input-masks.md`) |
 | Validação local | mesmas regras do [data-model](../data-model.md), ao sair do campo e ao salvar; o envio é bloqueado se houver erro |
 | Erros da API | `400`/`409` com `errors[]` → mensagem exibida sob o campo correspondente (`addresses[0].city` → campo Cidade do 1º endereço); erros sem campo → toast |
 | Salvar | `POST` (cadastro) ou `PUT` (edição); sucesso → toast + volta para a lista |

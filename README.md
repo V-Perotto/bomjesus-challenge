@@ -141,6 +141,8 @@ Telas: abas **Alunos** e **Professores**, cada uma com:
 
 - lista filtrável por status;
 - cadastro e edição com vários endereços, pré-visualização da foto e salário em reais;
+- máscaras que aceitam só dígitos: telefone com `+55` automático (`+55 (41) 99999-0000`), CEP
+  (`00000-000`) e salário (`0.000,00`);
 - **Desativar**, com confirmação;
 - **Excluir**, com confirmação reforçada.
 
